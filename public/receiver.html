@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>料理伝言ゲーム - 受信側</title>
+  <link rel="stylesheet" href="css/base.css">
+</head>
+<body class="receiver">
+  <div id="app">
+    <header class="topbar">
+      <div class="role-badge">📥 あてる人 <small>PC2・受信側</small></div>
+      <div class="progress"></div>
+      <div class="peer" id="peer-status">おくる人：まだ</div>
+    </header>
+
+    <main class="screens">
+      <!-- 1. 待機 -->
+      <section data-screen="waiting" class="screen screen--title">
+        <div class="decor" id="title-decor"></div>
+        <h1 class="game-title">料理伝言ゲーム</h1>
+        <div class="bouncy">📮</div>
+        <p class="instruction">料理の情報がとどくのを待っています<span class="dots"></span></p>
+        <div class="today-stats" data-stats hidden></div>
+      </section>
+
+      <!-- 2. 受信した情報 -->
+      <section data-screen="info" class="screen" hidden>
+        <p class="instruction">料理の情報がとどいたよ！よく見てね</p>
+        <div class="board" id="info-board"></div>
+        <div class="nav nav--center">
+          <button class="btn btn--primary btn--big btn--pulse" id="to-answer">料理をえらぶ ▶</button>
+        </div>
+      </section>
+
+      <!-- 3. 回答 -->
+      <section data-screen="answer" class="screen" hidden>
+        <p class="instruction" id="answer-instruction">どの料理かな？1つえらんでね</p>
+        <div class="mini-board" id="info-strip"></div>
+        <div class="dish-grid" id="dish-grid"></div>
+        <div class="nav">
+          <button class="btn btn--secondary" id="answer-back">◀ 情報を見る</button>
+          <p class="nav__hint" id="answer-status"></p>
+          <button class="btn btn--primary" id="answer-btn" disabled>これにする！</button>
+        </div>
+      </section>
+
+      <!-- 4. 調理アニメ -->
+      <section data-screen="cooking" class="screen" hidden>
+        <p class="instruction">料理をつくっているよ<span class="dots"></span></p>
+        <div class="stage" id="cooking-stage"></div>
+      </section>
+
+      <!-- 5. リザルト -->
+      <section data-screen="result" class="screen" hidden>
+        <div class="result" id="result-body"></div>
+        <div class="nav nav--center">
+          <button class="btn btn--primary" data-again>もう一回 ↺</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/game/receiver.js"></script>
+</body>
+</html>

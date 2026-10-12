@@ -1,0 +1,12 @@
+[
+  { "id": "meat", "name": "肉", "emoji": "🥩" },
+  { "id": "cabbage", "name": "キャベツ", "emoji": "🥬" },
+  { "id": "pepper", "name": "ピーマン", "emoji": "🫑" },
+  { "id": "carrot", "name": "ニンジン", "emoji": "🥕" },
+  { "id": "flour", "name": "粉", "emoji": "🌾" },
+  { "id": "onion", "name": "玉ねぎ", "emoji": "🧅" },
+  { "id": "potato", "name": "芋", "emoji": "🥔" },
+  { "id": "rice", "name": "米", "emoji": "🍚" },
+  { "id": "tomato", "name": "トマト", "emoji": "🍅" },
+  { "id": "egg", "name": "卵", "emoji": "🥚" }
+]

@@ -1,0 +1,12 @@
+[
+  { "id": "toubanjan", "name": "豆板醤", "emoji": "🌶️" },
+  { "id": "consomme", "name": "コンソメ", "emoji": "🧊" },
+  { "id": "sauce", "name": "ソース", "emoji": "🟤" },
+  { "id": "ketchup", "name": "ケチャップ", "emoji": "🥫" },
+  { "id": "soysauce", "name": "醤油", "emoji": "🍶" },
+  { "id": "roux", "name": "ルー", "emoji": "🍫" },
+  { "id": "cheese", "name": "チーズ", "emoji": "🧀" },
+  { "id": "vinegar", "name": "酢", "emoji": "🍋" },
+  { "id": "saltpepper", "name": "塩コショウ", "emoji": "🧂" },
+  { "id": "mayo", "name": "マヨネーズ", "emoji": "🫙" }
+]

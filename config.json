@@ -1,0 +1,11 @@
+{
+  "port": 3000,
+  "difficulty": "easy",
+  "sound": true,
+  "idleTimeoutSec": 90,
+  "resultReturnSec": 20,
+  "choices": {
+    "easy": 4,
+    "hard": 0
+  }
+}

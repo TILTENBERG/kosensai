@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>料理伝言ゲーム - 送信側</title>
+  <link rel="stylesheet" href="css/base.css">
+</head>
+<body class="sender">
+  <div id="app">
+    <header class="topbar">
+      <div class="role-badge">📤 おくる人 <small>PC1・送信側</small></div>
+      <nav class="progress" id="progress" hidden></nav>
+      <div class="peer" id="peer-status">あてる人：まだ</div>
+    </header>
+
+    <main class="screens">
+      <!-- 1. タイトル -->
+      <section data-screen="title" class="screen screen--title">
+        <div class="decor" id="title-decor"></div>
+        <h1 class="game-title">料理伝言ゲーム</h1>
+        <p class="title-tagline">ふたりで力をあわせて、料理をつたえよう！</p>
+        <button class="btn btn--primary btn--big btn--pulse" id="start-btn">スタート</button>
+        <div class="today-stats" data-stats hidden></div>
+      </section>
+
+      <!-- 2. お題 -->
+      <section data-screen="topic" class="screen" hidden>
+        <p class="instruction">この料理を相手に伝えよう！</p>
+        <div class="topic-card" id="topic-card"></div>
+        <p class="sub-instruction">食材・調味料・調理方法・一言メモで伝えるよ</p>
+        <div class="nav nav--center">
+          <button class="btn btn--primary btn--pulse" id="topic-next">つぎへ ▶</button>
+        </div>
+      </section>
+
+      <!-- 3〜6. 選択画面（sender.js で作る） -->
+      <div id="steps"></div>
+
+      <!-- 7. 確認 -->
+      <section data-screen="confirm" class="screen" hidden>
+        <p class="instruction">これでいいかな？「送信」をおしてね</p>
+        <div class="board" id="summary"></div>
+        <p class="sub-instruction" id="confirm-status"></p>
+        <div class="nav">
+          <button class="btn btn--secondary" id="confirm-back">◀ もどる</button>
+          <button class="btn btn--primary btn--big btn--pulse" id="send-btn">送信 🚀</button>
+        </div>
+      </section>
+
+      <!-- 8. 送信アニメ -->
+      <section data-screen="sending" class="screen" hidden>
+        <p class="instruction">料理の情報をおくっています！</p>
+        <div class="stage" id="send-stage"></div>
+      </section>
+
+      <!-- 9. 待機 -->
+      <section data-screen="waiting" class="screen screen--center" hidden>
+        <p class="instruction">相手が考え中<span class="dots"></span></p>
+        <div class="think-card">
+          <div class="bouncy">🤔</div>
+          <p>あてる人が<br>どの料理か考えているよ</p>
+        </div>
+        <div class="topic-mini" data-topic-mini></div>
+      </section>
+
+      <!-- リザルト -->
+      <section data-screen="result" class="screen" hidden>
+        <div class="result" id="result-body"></div>
+        <div class="nav nav--center">
+          <button class="btn btn--primary" data-again>もう一回 ↺</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/game/sender.js"></script>
+</body>
+</html>

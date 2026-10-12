@@ -1,0 +1,7 @@
+[
+  { "id": "stirfry", "name": "炒める", "tool": "中華鍋", "emoji": "🥘" },
+  { "id": "simmer", "name": "煮る", "tool": "鍋", "emoji": "🍲" },
+  { "id": "bake", "name": "焼く", "tool": "フライパン", "emoji": "🍳" },
+  { "id": "mix", "name": "和える", "tool": "ボウル", "emoji": "🥣" },
+  { "id": "deepfry", "name": "揚げる", "tool": "油の鍋", "emoji": "🫕" }
+]
