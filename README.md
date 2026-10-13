@@ -119,9 +119,19 @@ npm run check-assets  … まだ画像が無い食材・料理などの一覧
 | 調味料 | `public/assets/seasonings/<調味料ID>.png` | 同上 |
 | 料理 | `public/assets/dishes/<料理ID>.png` | 同上 |
 | 道具 | `public/assets/tools/<調理方法ID>.png` | 同上 |
+| なぞの料理 | `public/assets/dishes/mystery.png` | 同上（無ければ作れた料理を変な色で表示） |
+| キャラクター | `public/assets/chara/<sender か receiver>/<ポーズ>.png` | 背景透過 PNG（縦長） |
+| 背景 | `public/assets/bg/<sender / receiver / cooking>.jpg` | 1920×1080 |
 | 効果音 | `public/assets/sounds/<名前>.mp3`（`.wav` `.ogg` も可） | — |
 
 ID は `data/` の JSON を見てください（例：`meat.png`、`curry.png`、`simmer.png`）。
+
+### アニメ風イラストの作り方
+
+1. `docs/ART_PROMPTS.md` のプロンプトを Gemini（Nano Banana）に入れて画像を作り、`art-raw/<種類>/<ファイル名>.png` に保存します（背景はマゼンタ）。
+2. `python scripts/process-art.py` を実行すると、マゼンタを透明にして大きさをそろえ、`public/assets/` に置きます（初回だけ `python -m pip install pillow numpy`）。
+
+キャラクターの画像が1枚も無いときは、キャラは出ません（今までどおりの画面で動きます）。
 
 まだ画像が無いもの（絵文字で表示しているもの）は、次のコマンドで一覧にできます。
 

@@ -7,6 +7,10 @@ export function setAssets(a) {
   assets = a;
 }
 
+export function hasAsset(kind, id) {
+  return !!(assets[kind] && assets[kind].has(id));
+}
+
 export function iconEl(kind, item, className = 'icon') {
   const el = document.createElement('span');
   el.className = className;

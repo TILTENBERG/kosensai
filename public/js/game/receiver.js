@@ -3,17 +3,30 @@
 import { Net } from './net.js';
 import { loadBootstrap, resolveResult } from './data.js';
 import { Picker } from './selection.js';
-import { showScreen, currentScreen, h } from './screens.js';
+import { showScreen, currentScreen, onScreen, h } from './screens.js';
 import { iconEl } from '../ui/icons.js';
 import { initPage, setPeerStatus, connectPageFeatures } from '../ui/page.js';
 import { renderInfoBoard } from '../ui/infoboard.js';
-import { playReceiveAnimation, playCookingAnimation, showResult } from '../ui/animation.js';
+import { playReceiveAnimation, playCookingAnimation, showResult, sparkleOn } from '../ui/animation.js';
+import { setChara } from '../ui/chara.js';
 
 const game = await loadBootstrap();
-initPage(game);
+initPage(game, 'receiver');
 const net = new Net('receiver');
 connectPageFeatures(net);
 const $ = (id) => document.getElementById(id);
+
+// 画面ごとのキャラのポーズとセリフ（リザルトは animation.js の showResult が決める）
+const CHARA_LINES = {
+  waiting: ['idle', 'おくる人の 料理を まってるよ！'],
+  info: ['think', 'ヒントを よく見てね'],
+  answer: ['think', 'どれかな～？ 1つ えらんでね'],
+  cooking: ['guide', 'おいしくなあれ！'],
+};
+onScreen((name) => {
+  if (name === 'answer') return refreshAnswer(); // 選んだかどうかでセリフが変わる
+  if (CHARA_LINES[name]) setChara(...CHARA_LINES[name]);
+});
 
 const answerPicker = new Picker(1);
 const dishButtons = new Map();
@@ -30,7 +43,7 @@ function buildDishGrid() {
       h('span', { class: `dish-card__name${dish.name.length >= 7 ? ' is-long' : ''}` }, dish.name),
     );
     btn.addEventListener('click', () => {
-      answerPicker.toggle(dish.id);
+      if (answerPicker.toggle(dish.id) !== 'removed') sparkleOn(btn);
       refreshAnswer();
     });
     dishButtons.set(dish.id, btn);
@@ -58,6 +71,7 @@ function refreshAnswer() {
   $('answer-btn').disabled = !done;
   $('answer-btn').classList.toggle('btn--pulse', done);
   $('answer-status').textContent = done ? '「これにする！」をおしてね' : '';
+  if (currentScreen() === 'answer') setChara('think', done ? 'これで いいかな？ 「これにする！」をおしてね' : CHARA_LINES.answer[1]);
 }
 
 // ---------- 各画面 ----------
@@ -73,8 +87,10 @@ async function receiveInfo(view, animate) {
   showScreen('info');
   if (animate) {
     $('to-answer').disabled = true;
+    setChara('receive', 'きたきた！');
     await playReceiveAnimation(view);
     $('to-answer').disabled = false;
+    if (currentScreen() === 'info') setChara(...CHARA_LINES.info);
   }
 }
 
@@ -121,6 +137,7 @@ net.on('result', (msg) => cookAndShow(msg.result));
 net.on('reset', goWaiting);
 net.on('error', (msg) => {
   $('answer-status').textContent = msg.message;
+  setChara('almost', msg.message); // 下の段のヒントはキャラがいると見えないので、ふきだしでも知らせる
   refreshAnswer();
 });
 

@@ -1,9 +1,10 @@
 // 送信側・受信側で共通のページ準備。
-import { setAssets } from './icons.js';
+import { setAssets, iconEl } from './icons.js';
 import { setFuriganaDictionary, watchFurigana } from './furigana.js';
 import { fitStage, lockInteractions } from './stage.js';
 import { initSound } from './sound.js';
 import { setAnimationData } from './animation.js';
+import { initChara } from './chara.js';
 
 // タイトル画面のまわりにふわふわ浮かぶ食材（[左%, 上%, 遅れ秒]）
 // タイトル文字（中央）にかぶらないよう、左右と下の端に置く
@@ -12,8 +13,9 @@ const DECOR_SPOTS = [
   [90, 6, 0.3], [81, 32, 0.9], [91, 58, 1.5], [80, 82, 2.1], [67, 84, 2.4],
 ];
 
-export function initPage(game) {
+export function initPage(game, side) {
   setAssets(game.assets);
+  initChara(game, side);
   initSound(game);
   setAnimationData(game);
   setFuriganaDictionary(game.furigana || {});
@@ -22,12 +24,20 @@ export function initPage(game) {
   fitStage(app);
   lockInteractions();
 
+  // 背景イラスト（public/assets/bg/<side>.jpg と cooking.jpg）。無ければ水玉もようのまま
+  // CSS 変数の url() は css/ フォルダから見た場所になるので、/ から始まる絶対パスにする
+  const bg = game.assets.bg || {};
+  if (bg[side]) {
+    app.style.setProperty('--bg-art', `url("/${bg[side]}")`);
+    app.classList.add('has-bg');
+  }
+  if (bg.cooking) app.style.setProperty('--bg-cooking', `url("/${bg.cooking}")`);
+
+  // タイトルのまわりの食材（画像があれば画像、無ければ絵文字）
   const decor = document.getElementById('title-decor');
   if (decor) {
-    const emojis = game.ingredients.map((i) => i.emoji);
     DECOR_SPOTS.forEach(([x, y, delay], n) => {
-      const s = document.createElement('span');
-      s.textContent = emojis[n % emojis.length];
+      const s = iconEl('ingredients', game.ingredients[n % game.ingredients.length], 'icon decor__item');
       s.style.left = `${x}%`;
       s.style.top = `${y}%`;
       s.style.animationDelay = `${delay}s`;

@@ -4,8 +4,9 @@
 //   playCookingAnimation(info, method, resultDish): Promise … 調理（PC2）
 //   showResult(resultData): void                           … リザルト（両方）
 import { h } from '../game/screens.js';
-import { iconEl } from './icons.js';
+import { iconEl, hasAsset } from './icons.js';
 import { play } from './sound.js';
+import { setChara, charaReact } from './chara.js';
 
 // ---------- 小道具 ----------
 
@@ -70,6 +71,18 @@ function burst(stage, x, y, count = 16, { distance = 220, text = null, life = 80
       { transform: tf(Math.cos(angle) * d, Math.sin(angle) * d, 'scale(1) rotate(180deg)'), opacity: 0 },
     ], { duration: life, easing: 'cubic-bezier(.1,.8,.3,1)' }).then(() => el.remove());
   }
+}
+
+// ボタンなどを選んだときのキラキラ（#app の上に出す）
+export function sparkleOn(target) {
+  const app = document.getElementById('app');
+  if (!app || !target) return;
+  const p = centerIn(target, app);
+  const layer = h('div', { class: 'fx-layer fx-layer--sparkle' });
+  app.append(layer);
+  burst(layer, p.x, p.y, 12, { distance: 150, life: 600 });
+  burst(layer, p.x, p.y, 3, { distance: 120, text: '✦', life: 700 });
+  setTimeout(() => layer.remove(), 800);
 }
 
 // 動いている要素のうしろに光の粒を出し続ける。止めるときは戻り値の関数を呼ぶ
@@ -272,9 +285,9 @@ const COOKING_ACTIONS = {
 
   // 炒める：中華鍋で食材が跳ねる
   async stirfry({ stage, tool, items, cx, toolY }) {
-    const flames = [-90, 0, 90].map((dx) => fx(stage, 'fx-flame', cx + dx, toolY + 120, '🔥'));
-    flames.forEach((f, i) => animate(f, [{ transform: tf(0, 0, 'scale(0.9)') }, { transform: tf(0, -10, 'scale(1.25)') }], {
-      duration: 180, delay: i * 60, iterations: 10, direction: 'alternate', fill: 'none',
+    const flames = [-110, -40, 40, 110].map((dx) => fx(stage, 'fx-flame', cx + dx, toolY + 120, h('i'), h('i')));
+    flames.forEach((f, i) => animate(f, [{ transform: tf(0, 0, 'scale(0.9, 0.8)') }, { transform: tf(0, -12, 'scale(1.1, 1.3)') }], {
+      duration: 160, delay: i * 50, iterations: 12, direction: 'alternate', fill: 'none',
     }));
     animate(tool, [
       { transform: tf(0, 0, 'rotate(0deg)') },
@@ -354,6 +367,7 @@ export async function playCookingAnimation(info, method, resultDish) {
   const toolY = H * 0.62;
 
   fx(stage, 'cook-backdrop', cx, toolY - 60);
+  const heat = fx(stage, `cook-heat cook-heat--${method.id}`, cx, toolY + 110);
 
   // 1. 道具が出る
   const tool = fx(stage, 'cook-tool', cx, toolY,
@@ -421,7 +435,7 @@ export async function playCookingAnimation(info, method, resultDish) {
   burst(stage, cx, toolY - 40, 8, { distance: 360, text: '✨', life: 1000 });
   const flash = fx(stage, 'fx-flash', cx, H / 2);
   animate(flash, [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 700 }).then(() => flash.remove());
-  for (const el of [tool, ...onTool]) {
+  for (const el of [tool, heat, ...onTool]) {
     animate(el, [{ opacity: 1 }, { opacity: 0, transform: tf(0, 0, 'scale(0.4)') }], { duration: 300 }).then(() => el.remove());
   }
   await wait(250);
@@ -501,6 +515,24 @@ function confetti(count = 140) {
   setTimeout(() => layer.remove(), 5500);
 }
 
+// もくもく煙（なぞの料理）
+function smokePuff(target) {
+  const app = document.getElementById('app');
+  const p = centerIn(target, app);
+  const layer = h('div', { class: 'fx-layer' });
+  app.append(layer);
+  for (let i = 0; i < 14; i++) {
+    const el = fx(layer, 'fx-smoke', p.x + rand(-60, 60), p.y + rand(-30, 40));
+    const size = rand(90, 170);
+    el.style.width = el.style.height = `${size}px`;
+    animate(el, [
+      { transform: tf(0, 0, 'scale(0.2)'), opacity: 0.95 },
+      { transform: tf(rand(-200, 200), rand(-260, -80), 'scale(1.4)'), opacity: 0 },
+    ], { duration: rand(900, 1500), delay: i * 30, easing: 'cubic-bezier(.1,.7,.3,1)' });
+  }
+  setTimeout(() => layer.remove(), 2000);
+}
+
 export function showResult(resultData) {
   const r = resultData;
   const token = ++resultToken;
@@ -510,7 +542,11 @@ export function showResult(resultData) {
 
   const tier = h('p', { class: `result-tier result-tier--${r.tier}` }, TIER_LABEL[r.tier]);
   const percent = h('strong', {}, '0');
-  const madeIcon = iconEl('dishes', r.madeDish, 'icon icon--xl');
+  // なぞの料理：専用イラスト（dishes/mystery.png）があればそれを使う。無ければ作れた料理を変な色にする
+  const mysteryArt = r.tier === 'mystery' && hasAsset('dishes', 'mystery');
+  const madeIcon = mysteryArt
+    ? iconEl('dishes', { id: 'mystery', name: 'なぞの料理', emoji: '❓' }, 'icon icon--xl')
+    : iconEl('dishes', r.madeDish, 'icon icon--xl');
   const answerCard = h('div', { class: 'result-dish' },
     h('p', { class: 'result-dish__label' }, 'こたえ'),
     iconEl('dishes', r.answerDish, 'icon icon--l'),
@@ -530,6 +566,7 @@ export function showResult(resultData) {
     ),
   );
   tier.style.visibility = 'hidden';
+  setChara('think', 'どうかな…？');
 
   root.replaceChildren(
     tier,
@@ -558,16 +595,27 @@ export function showResult(resultData) {
       confetti();
       animate(tier, [{ transform: 'scale(0)' }, { transform: 'scale(1.2)', offset: 0.6 }, { transform: 'scale(1)' }], { duration: 600, easing: 'ease-out' });
       madeIcon.classList.add('is-perfect');
+      setChara('happy', 'やったね！ 大成功！');
+      charaReact('jump');
     } else if (r.tier === 'close') {
       play('complete');
       animate(tier, [{ transform: 'scale(0)' }, { transform: 'scale(1.1)', offset: 0.6 }, { transform: 'scale(1)' }], { duration: 500, easing: 'ease-out' })
         .then(() => animate(tier, [{ transform: 'rotate(-3deg)' }, { transform: 'rotate(3deg)' }], {
           duration: 160, iterations: 6, direction: 'alternate', fill: 'none',
         }));
+      setChara('almost', 'おしい！ あと少し！');
+      charaReact('shake');
     } else {
       // なぞの料理：変な色でぷるぷる、看板がずっこける
       play('funny');
-      madeIcon.classList.add('is-mystery');
+      madeIcon.classList.add(mysteryArt ? 'is-mystery-art' : 'is-mystery');
+      setChara('oops', 'あれれ？ なぞの料理だ！');
+      charaReact('fall');
+      smokePuff(madeIcon);
+      const app = document.getElementById('app');
+      animate(app, [
+        { translate: '0 0' }, { translate: '-14px 6px' }, { translate: '12px -4px' }, { translate: '-8px 2px' }, { translate: '0 0' },
+      ], { duration: 420, delay: 350, fill: 'none' });
       animate(tier, [
         { transform: 'translateY(-300px) rotate(0deg)' },
         { transform: 'translateY(0) rotate(0deg)', offset: 0.45 },

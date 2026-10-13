@@ -3,17 +3,33 @@
 import { Net } from './net.js';
 import { loadBootstrap, resolveResult } from './data.js';
 import { Picker } from './selection.js';
-import { showScreen, currentScreen, h } from './screens.js';
+import { showScreen, currentScreen, onScreen, h } from './screens.js';
 import { iconEl } from '../ui/icons.js';
 import { initPage, setPeerStatus, connectPageFeatures } from '../ui/page.js';
 import { renderInfoBoard } from '../ui/infoboard.js';
-import { playSendAnimation, showResult } from '../ui/animation.js';
+import { playSendAnimation, showResult, sparkleOn } from '../ui/animation.js';
+import { setChara } from '../ui/chara.js';
 
 const game = await loadBootstrap();
-initPage(game);
+initPage(game, 'sender');
 const net = new Net('sender');
 connectPageFeatures(net);
 const $ = (id) => document.getElementById(id);
+
+// 画面ごとのキャラのポーズとセリフ（リザルトは animation.js の showResult が決める）
+const CHARA_LINES = {
+  title: ['idle', 'いっしょに 料理を つたえよう！'],
+  topic: ['guide', 'この料理の ヒントを えらんでね！'],
+  confirm: ['guide', 'じゅんび OK？'],
+  sending: ['send', 'とどけー！'],
+  waiting: ['think', 'あてる人が 考えてるよ…'],
+};
+onScreen((name) => {
+  if (CHARA_LINES[name]) setChara(...CHARA_LINES[name]);
+  // 選択ステップでは、下の段のヒント（あと○つ…）をキャラがしゃべる
+  const step = steps.find((s) => s.screen === name);
+  if (step) setChara(step.picker.isComplete() ? 'happy' : 'guide', step.hintText);
+});
 
 let targetDishId = null;
 let busy = false; // 送信アニメ中
@@ -134,6 +150,7 @@ function hop(el, cls) {
 
 function onPick(step, id) {
   const r = step.picker.toggle(id);
+  if (r === 'added' || r === 'replaced') sparkleOn(step.buttons.get(id));
   if (r === 'added' && step.pot) {
     step.pot.lastAdded = id;
     hop(step.pot.el, 'hop');
@@ -167,7 +184,9 @@ function refreshStep(step) {
   if (step.pot) refreshPot(step);
 
   const left = step.max - step.picker.values.length;
-  step.hint.textContent = left > 0 ? `あと${left}つ えらんでね` : 'OK！「つぎへ」をおしてね';
+  step.hintText = left > 0 ? `あと${left}つ えらんでね` : 'OK！「つぎへ」をおしてね';
+  step.hint.textContent = step.hintText;
+  if (currentScreen() === step.screen) setChara(left > 0 ? 'guide' : 'happy', step.hintText);
   step.nextBtn.disabled = !step.picker.isComplete();
   step.nextBtn.classList.toggle('btn--pulse', step.picker.isComplete());
 }

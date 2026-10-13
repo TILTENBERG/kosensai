@@ -82,11 +82,20 @@ function listAssets() {
     const ext = path.extname(f).toLowerCase();
     if (SOUND_EXTS.includes(ext)) sounds[path.basename(f, ext)] = `assets/sounds/${f}`;
   }
+  // 背景は jpg か png（拡張子つきのパスで返す）
+  const bg = {};
+  for (const f of listFiles('bg')) {
+    const ext = path.extname(f).toLowerCase();
+    if (['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) bg[path.basename(f, ext)] = `assets/bg/${f}`;
+  }
   return {
     ingredients: pngIds('ingredients'),
     seasonings: pngIds('seasonings'),
     dishes: pngIds('dishes'),
     tools: pngIds('tools'),
+    // キャラクターのポーズ（public/assets/chara/<sender|receiver>/<pose>.png）
+    chara: { sender: pngIds('chara/sender'), receiver: pngIds('chara/receiver') },
+    bg,
     sounds,
   };
 }

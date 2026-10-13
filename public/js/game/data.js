@@ -22,6 +22,11 @@ function buildGameData({ config, data, assets }) {
       seasonings: new Set(assets.seasonings),
       dishes: new Set(assets.dishes),
       tools: new Set(assets.tools),
+      chara: {
+        sender: new Set((assets.chara && assets.chara.sender) || []),
+        receiver: new Set((assets.chara && assets.chara.receiver) || []),
+      },
+      bg: assets.bg || {},
       sounds: assets.sounds,
     },
     ...data,

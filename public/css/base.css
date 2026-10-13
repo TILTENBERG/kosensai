@@ -28,6 +28,16 @@
   --bg-dot: #ffe6cc;
   --accent: #ffc93c;
 
+  /* アニメ風の線と紙 */
+  --ink-line: #5b3a29;
+  --ink-line-soft: rgba(91, 58, 41, 0.35);
+  --paper: #fffaf0;
+  --paper-edge: #f3e3c8;
+  --theme-light: #ffb067;
+  --title-top: #ffe27a;
+  /* 紙のざらざら（SVG のノイズ。外部ファイル不要） */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+
   --font: "UD デジタル 教科書体 NK-B", "UD Digi Kyokasho NK-B", "UD デジタル 教科書体 N-B", "UD Digi Kyokasho N-B",
     "BIZ UDPGothic", "Meiryo", "Hiragino Maru Gothic ProN", sans-serif;
 }
@@ -42,6 +52,10 @@ body.receiver {
   --bg: #eef7ff;
   --bg-dot: #d9ebff;
   --accent: #4cd3a5;
+  --theme-light: #7cc4ff;
+  --title-top: #a8f0ff;
+  --ink-line: #24406b;
+  --ink-line-soft: rgba(36, 64, 107, 0.35);
 }
 
 * { box-sizing: border-box; }
@@ -494,9 +508,11 @@ ruby rt {
   overflow: hidden;
 }
 
-.decor span {
+.decor__item {
   position: absolute;
   font-size: 110px;
+  width: 150px;
+  height: 150px;
   opacity: 0.9;
   animation: float 4s ease-in-out infinite;
   font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
