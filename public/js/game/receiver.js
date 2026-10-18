@@ -98,7 +98,7 @@ async function cookAndShow(result) {
   const seq = roundSeq;
   const r = resolveResult(result, game);
   showScreen('cooking');
-  await playCookingAnimation(result.sentInfo, r.sent.method, r.madeDish);
+  await playCookingAnimation(result.sentInfo, r.sent.method, r.madeDish, r.answerDish);
   if (seq !== roundSeq) return; // 途中でリセットされた
   net.send('cooking_done');
   showResultScreen(result);

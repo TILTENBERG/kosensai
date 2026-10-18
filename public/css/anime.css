@@ -387,6 +387,8 @@ body.receiver #app.has-bg[data-now="waiting"]::before { opacity: 0.55; }
 
 /* 選択肢が2段ある画面（調味料など）にかぶらないよう、ふきだしを少し下げる */
 #app[data-now^="step-"] .chara__bubble { top: 44px; }
+/* リザルトの説明セリフ（2〜3行）が「もう一回」ボタンにかからない幅 */
+#app[data-now="result"] .chara__bubble { max-width: 440px; }
 /* 送信中：ふきだしはカードの列より下、顔の横に */
 #app[data-now="sending"] .chara.chara--sender .chara__bubble { top: 80px; left: 96%; }
 
@@ -517,3 +519,11 @@ body.receiver .has-chara .decor__item:nth-child(n+6) { display: none; }
 .pot__art--back { z-index: 1; filter: drop-shadow(0 16px 12px rgba(60, 40, 30, 0.3)); }
 .pot__art--front { z-index: 3; }
 .pot__art--clip { clip-path: inset(var(--pot-rim) 0 0 0); }
+
+/* ふきだし：分かち書きのスペースでだけ改行する（「お／好み焼き」のように言葉の途中で切れないように）。chara.js が区切る */
+.chara__phrase { white-space: nowrap; }
+
+/* あてる人の「えらんだ料理」ラベルは長いので、正解ハンコは写真の右下にずらす */
+body.receiver .result-dish .stamp { top: 100px; right: -60px; }
+
+.result-dish__name.is-long { font-size: 30px; white-space: nowrap; }

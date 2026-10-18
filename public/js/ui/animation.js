@@ -1,7 +1,7 @@
 // 演出まとめ（すべて CSS / JavaScript。動画は使わない）
 //   playSendAnimation(info): Promise                       … 送信（PC1）
 //   playReceiveAnimation(info): Promise                    … 受信（PC2）
-//   playCookingAnimation(info, method, resultDish): Promise … 調理（PC2）
+//   playCookingAnimation(info, method, resultDish, chosenDish): Promise … 調理（PC2）
 //   showResult(resultData): void                           … リザルト（両方）
 import { h } from '../game/screens.js';
 import { iconEl, hasAsset } from './icons.js';
@@ -357,7 +357,8 @@ const COOKING_ACTIONS = {
   },
 };
 
-export async function playCookingAnimation(info, method, resultDish) {
+// resultDish … とどいた情報で作れた料理（できあがる料理）、chosenDish … あてる人がえらんだ料理
+export async function playCookingAnimation(info, method, resultDish, chosenDish) {
   const stage = document.getElementById('cooking-stage');
   if (!stage || !gameRef) return wait(2000);
   stage.replaceChildren();
@@ -458,6 +459,9 @@ export async function playCookingAnimation(info, method, resultDish) {
   ], { duration: 600, easing: 'ease-out' });
   say(stage, 'ジャーン！', cx, H * 0.12, { life: 1400, rotate: -6 });
   burst(stage, cx, H * 0.5, 20, { distance: 380, life: 1000 });
+  // できる料理は「えらんだ料理」ではなく「とどいた食材で作れた料理」。ちがうときはキャラが知らせる
+  if (chosenDish && chosenDish.id !== resultDish.id) setChara('almost', `あれ？ ${resultDish.name}が できた！`);
+  else setChara('happy', `${resultDish.name}が できた！`);
   await wait(1300);
 }
 
@@ -470,6 +474,17 @@ const TIER_LABEL = {
 };
 
 let resultToken = 0;
+
+// 「えらんだ料理」と「作れた料理」がちがうと分かりにくいので、正解ハンコのあとにキャラが説明する。
+// 作れた料理がお題どおりで正解なら null（点数のセリフのまま）
+function explainLine(r) {
+  if (r.correct) {
+    if (r.madeDish.id === r.targetDish.id) return null;
+    return `こたえは正解！ でも ${r.tier === 'mystery' ? 'なぞの料理' : r.madeDish.name}に なっちゃった`;
+  }
+  if (r.madeDish.id === r.answerDish.id && r.tier !== 'mystery') return `情報どおりだけど お題は ${r.targetDish.name}だったよ`;
+  return `ざんねん！ お題は ${r.targetDish.name}だったよ`;
+}
 
 // 完成度を 0 からカウントアップ
 function countUp(el, to, duration) {
@@ -533,6 +548,11 @@ function smokePuff(target) {
   setTimeout(() => layer.remove(), 2000);
 }
 
+// お題・こたえの小さいカード用の料理名（長い名前は小さくして、「ー」だけが次の行に行かないように）
+function dishName(dish) {
+  return h('p', { class: `result-dish__name${dish.name.length >= 7 ? ' is-long' : ''}` }, dish.name);
+}
+
 export function showResult(resultData) {
   const r = resultData;
   const token = ++resultToken;
@@ -547,13 +567,15 @@ export function showResult(resultData) {
   const madeIcon = mysteryArt
     ? iconEl('dishes', { id: 'mystery', name: 'なぞの料理', emoji: '❓' }, 'icon icon--xl')
     : iconEl('dishes', r.madeDish, 'icon icon--xl');
+  // あてる人の画面では「とどいた情報」「えらんだ料理」、おくる人の画面では「送った情報」「こたえ」
+  const isReceiver = document.body.classList.contains('receiver');
   const answerCard = h('div', { class: 'result-dish' },
-    h('p', { class: 'result-dish__label' }, 'こたえ'),
+    h('p', { class: 'result-dish__label' }, isReceiver ? 'えらんだ料理' : 'こたえ'),
     iconEl('dishes', r.answerDish, 'icon icon--l'),
-    h('p', { class: 'result-dish__name' }, r.answerDish.name),
+    dishName(r.answerDish),
   );
   const madeCard = h('div', { class: 'result-made' },
-    h('p', { class: 'result-made__lead' }, '送った情報で作れたのは…'),
+    h('p', { class: 'result-made__lead' }, isReceiver ? 'とどいた情報で作れたのは…' : '送った情報で作れたのは…'),
     madeIcon,
     h('p', { class: 'result-made__name' }, r.madeDish.name),
     h('div', {},
@@ -576,7 +598,7 @@ export function showResult(resultData) {
         h('div', { class: 'result-dish' },
           h('p', { class: 'result-dish__label' }, 'お題'),
           iconEl('dishes', r.targetDish, 'icon icon--l'),
-          h('p', { class: 'result-dish__name' }, r.targetDish.name),
+          dishName(r.targetDish),
         ),
         answerCard,
       ),
@@ -637,5 +659,13 @@ export function showResult(resultData) {
     // 正解ハンコ
     answerCard.append(h('div', { class: `stamp ${r.correct ? 'is-correct' : 'is-wrong'}` }, r.correct ? '正解！' : 'ざんねん'));
     play(r.correct ? 'correct' : 'wrong');
+
+    // ポーズはそのまま（ずっこけ等を消さない）で、セリフだけ説明に変える
+    const line = explainLine(r);
+    if (line) {
+      await wait(700);
+      if (token !== resultToken) return;
+      setChara({ perfect: 'happy', close: 'almost', mystery: 'oops' }[r.tier], line);
+    }
   })();
 }

@@ -65,7 +65,8 @@ export function setChara(pose, text = '') {
   // ふりがなが足されると textContent が変わるので、前のセリフは変数で覚えておく
   if (currentText !== text) {
     currentText = text;
-    bubble.textContent = text;
+    // 分かち書きのスペースごとに区切って、言葉の途中（ふりがなの境目）で改行されないようにする
+    bubble.replaceChildren(...text.split(' ').flatMap((w, i) => [i ? ' ' : '', h('span', { class: 'chara__phrase' }, w)]));
     bubble.hidden = !text;
     if (text) {
       bubble.classList.remove('is-pop');
