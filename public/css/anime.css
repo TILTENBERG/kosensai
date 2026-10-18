@@ -490,3 +490,30 @@ body.receiver .has-chara .decor__item:nth-child(n+6) { display: none; }
 
 /* なぞの料理の専用イラスト（dishes/mystery.png）があるときは、色を変えずにそのまま見せる */
 .icon.is-mystery-art { animation: jelly 0.9s ease-in-out infinite; }
+
+/* ---------- おなべの絵（assets/ui/pot.png があるとき） ----------
+   奥（pot.png）→ 食材 → 手前（pot-front.png：鍋の口の中と奥のふちを消した絵）の順に重ねる。
+   食材は鍋の口の中だけに見えて、手前のふちのカーブにそってかくれる。
+   pot-front.png が無いときだけ、pot.png を --pot-rim の高さでまっすぐ切って手前に使う。
+
+   今の鍋の絵（幅360pxで表示、上から98〜380px）：鍋の口は 中心x=180 / はば約263px / 上から128〜238px */
+.pot--art { --pot-rim: 50%; }
+
+/* 食材の下のほうが手前のふちにかくれる高さ */
+.pot--art .pot__items { top: 102px; }
+/* 3つ並んでも鍋の口（はば約263px）に入る大きさ */
+.pot--art .pot__item { margin: 0 -8px; }
+.pot--art .pot__item .icon { width: 104px; height: 104px; font-size: 84px; }
+
+.pot__art {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.pot__art--back { z-index: 1; filter: drop-shadow(0 16px 12px rgba(60, 40, 30, 0.3)); }
+.pot__art--front { z-index: 3; }
+.pot__art--clip { clip-path: inset(var(--pot-rim) 0 0 0); }

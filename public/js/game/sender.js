@@ -4,7 +4,7 @@ import { Net } from './net.js';
 import { loadBootstrap, resolveResult } from './data.js';
 import { Picker } from './selection.js';
 import { showScreen, currentScreen, onScreen, h } from './screens.js';
-import { iconEl } from '../ui/icons.js';
+import { iconEl, hasAsset } from '../ui/icons.js';
 import { initPage, setPeerStatus, connectPageFeatures } from '../ui/page.js';
 import { renderInfoBoard } from '../ui/infoboard.js';
 import { playSendAnimation, showResult, sparkleOn } from '../ui/animation.js';
@@ -115,8 +115,23 @@ function buildStepScreens() {
 }
 
 // 「おなべ」：選んだ食材が鍋に落ちて入る。3つそろうと湯気が出る。鍋の中の食材を押すと取り出せる
+// assets/ui/pot.png があれば「奥（全体）」→ 食材 →「手前」の順に重ねて、食材が鍋の中に入って見えるようにする。
+// 手前は pot-front.png（process-art.py が作る、鍋の口のカーブで切った絵）。
+// それが無いときは pot.png をふちの高さでまっすぐ切って使う。どちらも無ければCSSで描いた鍋。
 function buildPot(step) {
   const items = h('div', { class: 'pot__items' });
+  if (hasAsset('ui', 'pot')) {
+    const art = (cls, file) => h('img', { class: `pot__art ${cls}`, src: `assets/ui/${file}.png`, alt: '', draggable: 'false' });
+    const el = h('div', { class: 'pot pot--art' },
+      h('div', { class: 'pot__steam' }, h('i'), h('i'), h('i')),
+      art('pot__art--back', 'pot'),
+      items,
+      hasAsset('ui', 'pot-front')
+        ? art('pot__art--front', 'pot-front')
+        : art('pot__art--front pot__art--clip', 'pot'),
+    );
+    return { el, items, lastAdded: null };
+  }
   const el = h('div', { class: 'pot' },
     h('div', { class: 'pot__steam' }, h('i'), h('i'), h('i')),
     h('div', { class: 'pot__back' }),

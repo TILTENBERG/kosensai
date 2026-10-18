@@ -22,6 +22,8 @@ const POSES = {
   receiver: ['idle', 'guide', 'think', 'happy', 'almost', 'oops', 'receive'],
 };
 const BACKGROUNDS = [['sender', 'おくる人の背景'], ['receiver', 'あてる人の背景'], ['cooking', '調理画面の背景']];
+// 画面のパーツ（無ければCSSで描いた見た目になる）
+const UI_PARTS = [['pot', '食材を入れるおなべ']];
 
 let missingTotal = 0;
 let total = 0;
@@ -52,6 +54,13 @@ total += BACKGROUNDS.length;
 missingTotal += bgMissing.length;
 console.log(`■ 背景：${BACKGROUNDS.length - bgMissing.length} / ${BACKGROUNDS.length} 枚あり`);
 for (const [id, label] of bgMissing) console.log(`    まだ無い  public/assets/bg/${id}.jpg   ${label}`);
+console.log('');
+const uiHave = new Set(assets.ui || []);
+const uiMissing = UI_PARTS.filter(([id]) => !uiHave.has(id));
+total += UI_PARTS.length;
+missingTotal += uiMissing.length;
+console.log(`■ 画面のパーツ：${UI_PARTS.length - uiMissing.length} / ${UI_PARTS.length} 枚あり`);
+for (const [id, label] of uiMissing) console.log(`    まだ無い  public/assets/ui/${id}.png   ${label}`);
 console.log('');
 
 console.log(`ぜんぶで ${total - missingTotal} / ${total} 枚。のこり ${missingTotal} 枚は、絵文字や今までの見た目で代わりに表示しています。`);

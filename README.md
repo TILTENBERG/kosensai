@@ -122,6 +122,7 @@ npm run check-assets  … まだ画像が無い食材・料理などの一覧
 | なぞの料理 | `public/assets/dishes/mystery.png` | 同上（無ければ作れた料理を変な色で表示） |
 | キャラクター | `public/assets/chara/<sender か receiver>/<ポーズ>.png` | 背景透過 PNG（縦長） |
 | 背景 | `public/assets/bg/<sender / receiver / cooking>.jpg` | 1920×1080 |
+| おなべ（食材の画面） | `public/assets/ui/pot.png` | 横幅 900px まで・背景透過（無ければCSSで描いた鍋） |
 | 効果音 | `public/assets/sounds/<名前>.mp3`（`.wav` `.ogg` も可） | — |
 
 ID は `data/` の JSON を見てください（例：`meat.png`、`curry.png`、`simmer.png`）。

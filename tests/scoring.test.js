@@ -34,18 +34,18 @@ test('最高点の料理を選ぶ（ハヤシライスと牛丼は調味料で�
 });
 
 test('同点ならお題の料理を優先する', () => {
-  // 肉じゃが（醤油）とダッカルビ（チーズ）が両方80点になる
-  const sent = info(['meat', 'potato', 'onion'], 'saltpepper', 'stirfry');
-  assert.equal(scoreDish(sent, dish('nikujaga')).score, 80);
-  assert.equal(scoreDish(sent, dish('dakgalbi')).score, 80);
-  assert.equal(findBestDish(sent, dishes, 'dakgalbi').dishId, 'dakgalbi');
-  assert.equal(findBestDish(sent, dishes, 'nikujaga').dishId, 'nikujaga');
+  // 牛丼（醤油）とハヤシライス（ルー）が両方80点になる
+  const sent = info(['meat', 'onion', 'rice'], 'saltpepper', 'simmer');
+  assert.equal(scoreDish(sent, dish('gyudon')).score, 80);
+  assert.equal(scoreDish(sent, dish('hayashi')).score, 80);
+  assert.equal(findBestDish(sent, dishes, 'hayashi').dishId, 'hayashi');
+  assert.equal(findBestDish(sent, dishes, 'gyudon').dishId, 'gyudon');
 });
 
 test('同点でお題が含まれないならリストの順番が先の料理', () => {
-  const sent = info(['meat', 'potato', 'onion'], 'saltpepper', 'stirfry');
-  assert.equal(findBestDish(sent, dishes, 'curry').dishId, 'nikujaga');
-  assert.equal(findBestDish(sent, dishes).dishId, 'nikujaga');
+  const sent = info(['meat', 'onion', 'rice'], 'saltpepper', 'simmer');
+  assert.equal(findBestDish(sent, dishes, 'curry').dishId, 'gyudon');
+  assert.equal(findBestDish(sent, dishes).dishId, 'gyudon');
 });
 
 test('お題が後ろにあって同点でも、より高い点の料理が勝つ', () => {
@@ -79,14 +79,14 @@ test('buildResult：正解のとき', () => {
 
 test('buildResult：なぞの料理・不正解のとき', () => {
   const r = buildResult({
-    info: info(['tomato', 'flour', 'egg'], 'vinegar', 'deepfry'),
+    info: info(['tomato', 'flour', 'pepper'], 'vinegar', 'deepfry'),
     dishes,
     targetDishId: 'curry',
     answerDishId: 'hamburg',
   });
   assert.equal(r.percent, 40);
   assert.equal(r.tier, 'mystery');
-  assert.equal(r.made.dishId, 'tomatomarine'); // 40点の料理のうちリストで最初
+  assert.equal(r.made.dishId, 'nikuzume'); // 40点の料理（ピーマンの肉詰め・酢豚）のうちリストで最初
   assert.equal(r.correct, false);
   assert.equal(r.answerDishId, 'hamburg');
 });

@@ -115,7 +115,7 @@ Keep the bottles **without readable labels** (just colored labels or simple shap
 | `sauce.png` | a Japanese brown okonomiyaki sauce bottle, dark sauce, plain label with no text |
 | `ketchup.png` | a red squeeze ketchup bottle, plain label with no text |
 | `soysauce.png` | a small glass soy sauce dispenser with red cap, dark soy sauce inside |
-| `roux.png` | a block of Japanese curry roux broken into squares, brown, on its plastic tray |
+| `roux.png` | two blocks of Japanese roux side by side on plastic trays, broken into squares: one brown curry roux and one creamy white stew roux |
 | `cheese.png` | a wedge of yellow cheese with holes and a small pile of shredded cheese |
 | `vinegar.png` | a clear glass bottle of rice vinegar, pale gold liquid, plain label with no text |
 | `saltpepper.png` | a salt-and-pepper shaker set, white and black, wooden caps |
@@ -138,7 +138,7 @@ Each dish is served on a plate or bowl, freshly cooked, with a little steam.
 | Save as `art-raw/dishes/…` | Subject |
 |---|---|
 | `hoikoro.png` | Hoikoro: stir-fried pork belly, cabbage and green pepper in glossy red chili bean sauce, on a white plate |
-| `rollcabbage.png` | Japanese cabbage rolls in clear golden consommé soup, in a shallow bowl |
+| `rollcabbage.png` | Japanese cabbage rolls in clear golden consommé soup in a shallow bowl, with large bright orange carrot chunks clearly visible in the soup next to the rolls |
 | `okonomiyaki.png` | okonomiyaki pancake with brown sauce, mayonnaise zigzag, bonito flakes and green seaweed, on a plate |
 | `nikuzume.png` | green peppers stuffed with meat, pan-fried, with ketchup sauce, on a plate |
 | `nikujaga.png` | nikujaga: simmered beef, potatoes, onion and carrot in sweet soy broth, in a Japanese bowl |
@@ -146,9 +146,9 @@ Each dish is served on a plate or bowl, freshly cooked, with a little steam.
 | `stew.png` | Japanese cream stew with chicken, potato and carrot in a white sauce, in a deep bowl |
 | `dakgalbi.png` | cheese dakgalbi: spicy chicken and vegetables in a hot pan with stretchy melted cheese |
 | `hamburg.png` | Japanese hamburg steak with shiny demi-glace sauce, with a side of vegetables on a plate |
-| `gapao.png` | gapao rice: Thai basil minced meat with green pepper over rice, topped with a fried egg |
+| `gapao.png` | gapao rice: Thai basil minced meat with lots of green bell pepper pieces next to white rice on a plate, no egg |
 | `tacorice.png` | Okinawan taco rice: seasoned ground meat, shredded lettuce, tomato and cheese over rice |
-| `tomatomarine.png` | tomato marinade salad with sliced tomato, onion and thin meat, glossy dressing, in a glass bowl |
+| `minestrone.png` | minestrone: red tomato soup with small pieces of meat, onion and tomato, in a deep soup bowl |
 | `subuta.png` | sweet-and-sour pork: crispy fried pork, carrot and green pepper in shiny sweet-and-sour sauce |
 | `gyudon.png` | gyudon: thin simmered beef and onion over rice in a large donburi bowl |
 | `oyakodon.png` | oyakodon: chicken and soft fluffy egg over rice in a donburi bowl |
@@ -161,6 +161,19 @@ Each dish is served on a plate or bowl, freshly cooked, with a little steam.
 | `consommesoup.png` | clear golden consommé soup with cabbage, carrot and onion pieces, in a soup cup |
 | `hayashi.png` | hayashi rice: glossy dark brown beef and onion sauce next to white rice, on a plate |
 | `mystery.png` | a funny weird mystery dish: neon-green and bright-blue bubbling goo on a plate (no purple or pink) with a cute confused face drawn in it, swirls of odd-colored steam (for the "なぞの料理" result) |
+
+---
+
+### Redo list (2026-10-18, after a cooking check from a teammate's mom)
+
+These four changed. Make them in the dishes chat (or a new chat with the START message above), save with the same names, and run the script again.
+
+| Save as | Why |
+|---|---|
+| `art-raw/dishes/rollcabbage.png` | the carrot must be easy to see (it's one of the 3 ingredients) |
+| `art-raw/dishes/gapao.png` | the old picture had a fried egg, but egg isn't one of its ingredients |
+| `art-raw/dishes/minestrone.png` | new dish (replaces トマトマリネ) |
+| `art-raw/seasonings/roux.png` | the same ルー is used for curry, hayashi **and** cream stew, so show brown and white roux together |
 
 ---
 
@@ -184,6 +197,18 @@ Reply "OK" and wait for my next message.
 
 ---
 
+## 7. Game parts (1)
+
+Use the same START message as sections 2–5 (new chat, or continue the tools chat). Attach `tools/simmer.png` as a style reference.
+
+| Save as `art-raw/ui/…` | Subject |
+|---|---|
+| `pot.png` | a big round cooking pot for a kids' cooking game, warm red-orange enamel with a cream-colored rim and two small round side handles, seen from a slightly high angle so the wide open top is clearly visible as an oval, the inside is empty and dark brown, no lid, no food, no steam, no stove. The pot is wider than it is tall. |
+
+This is the pot the sender drops ingredients into. The game draws it twice (once behind the ingredients, once in front, cut at the rim), so the **open top must be clearly visible** and the pot must be **empty**.
+
+---
+
 ## Checklist
 
 When you've saved a batch, tell me and I'll run the script and wire them in.
@@ -194,5 +219,6 @@ When you've saved a batch, tell me and I'll run the script and wire them in.
 - [ ] Tools: 5
 - [ ] Dishes: 24
 - [ ] Backgrounds: 3
+- [ ] Game parts: 1 (pot)
 
 **Priority if time is short:** characters → dishes → backgrounds → ingredients → tools → seasonings. Anything missing falls back to the old image or emoji, so the game always works.

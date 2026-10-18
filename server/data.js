@@ -95,6 +95,8 @@ function listAssets() {
     tools: pngIds('tools'),
     // キャラクターのポーズ（public/assets/chara/<sender|receiver>/<pose>.png）
     chara: { sender: pngIds('chara/sender'), receiver: pngIds('chara/receiver') },
+    // 画面のパーツ（public/assets/ui/<name>.png）。pot … 食材を入れるおなべ（無ければCSSで描いた鍋）
+    ui: pngIds('ui'),
     bg,
     sounds,
   };

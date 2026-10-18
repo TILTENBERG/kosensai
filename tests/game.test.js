@@ -233,6 +233,30 @@ test('makeChoices：送った情報にいちばん近い料理（ひっかけ）
   }
 });
 
+test('makeChoices：ひっかけは全部、送った情報に近い料理から選ぶ（かんたんすぎないように）', () => {
+  const { scoreDish } = require('../server/scoring');
+  const score = (id) => scoreDish(curryInfo, data.dishes.find((d) => d.id === id)).score;
+  for (let n = 0; n < 40; n++) {
+    const c = makeChoices('curry', curryInfo, data.dishes, 4);
+    const decoys = c.filter((id) => id !== 'curry');
+    const left = data.dishes.map((d) => d.id).filter((id) => !c.includes(id));
+    const worstDecoy = Math.min(...decoys.map(score));
+    const bestLeft = Math.max(...left.map(score));
+    assert.ok(worstDecoy >= bestLeft, `${decoys} の中に、選ばれなかった料理より遠いものがある`);
+    // カレーの情報なら、シチューとハヤシライス（80点）は必ず入る
+    assert.ok(c.includes('stew') && c.includes('hayashi'), String(c));
+  }
+});
+
+test('makeChoices：同点のひっかけはランダムに入れかわる', () => {
+  const seen = new Set();
+  for (let n = 0; n < 60; n++) {
+    for (const id of makeChoices('curry', curryInfo, data.dishes, 4)) seen.add(id);
+  }
+  // 60点の牛丼と親子丼は、どちらも出ることがある
+  assert.ok(seen.has('gyudon') && seen.has('oyakodon'), [...seen].join(','));
+});
+
 test('makeChoices：0 や料理の数以上なら null（全部から選ぶ）', () => {
   assert.equal(makeChoices('curry', curryInfo, data.dishes, 0), null);
   assert.equal(makeChoices('curry', curryInfo, data.dishes, undefined), null);

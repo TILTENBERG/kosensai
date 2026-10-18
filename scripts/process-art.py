@@ -7,6 +7,8 @@
 - 食材・調味料・道具・料理 → 512×512 の正方形 PNG
 - キャラクター → 高さ 900px までの PNG（縦長のまま）
 - 背景 (bg) → 1920×1080 の JPG（マゼンタ処理はしない）
+- 画面のパーツ (ui) → 縦横 900px までの PNG（形はそのまま）
+  ui/pot は、鍋の口より手前だけの絵 pot-front.png も作る（食材が鍋の中に入って見えるように）
 
 必要なもの：python -m pip install pillow numpy
 """
@@ -15,7 +17,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "art-raw"
@@ -68,6 +70,50 @@ def fit_height(img, max_h):
     return img.resize((w, max_h), Image.LANCZOS)
 
 
+def fit_box(img, max_side):
+    scale = max_side / max(img.size)
+    if scale >= 1:
+        return img
+    return img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+
+
+def pot_front(img):
+    """おなべの「手前」だけの絵を作る。鍋の口の中（暗い茶色）と、口の真ん中より上（奥のふち）を消す。
+    ゲームでは 奥（pot.png）→ 食材 → 手前（pot-front.png）の順に重ねるので、
+    食材は鍋の口の中だけに見えて、手前のふちのカーブにそってかくれる。"""
+    a = np.asarray(img.convert("RGBA")).astype(np.float32)
+    r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
+    h, w = al.shape
+    # 鍋の中：暗い茶色（赤い鍋の色・こい影の線・クリーム色のふちは入らない）
+    inside = (al > 200) & (r + g + b < 360) & (g > r * 0.45)
+    # 真ん中の列でいちばん長く続く「中」の、まん中を種にして、つながっている所だけを取る
+    col = inside[:, w // 2]
+    best, start = (0, 0), None
+    for y in range(h + 1):
+        if y < h and col[y]:
+            start = y if start is None else start
+        elif start is not None:
+            if y - start > best[1] - best[0]:
+                best = (start, y)
+            start = None
+    if best[1] - best[0] < h * 0.1:
+        raise ValueError("鍋の口（暗い茶色の部分）が見つかりません")
+    # numpy から作った画像は読み取り専用なので copy() してから塗る
+    mask = Image.fromarray((inside * 255).astype(np.uint8), "L").copy()
+    ImageDraw.floodfill(mask, (w // 2, (best[0] + best[1]) // 2), 128)
+    ys, xs = np.nonzero(np.asarray(mask) == 128)
+    cx, cy = (xs.min() + xs.max()) / 2, (ys.min() + ys.max()) / 2
+    rx, ry = (xs.max() - xs.min()) / 2, (ys.max() - ys.min()) / 2
+    # 楕円の外ほど 1 より大きい。ふちは 2px ぶん ぼかす
+    yy, xx = np.mgrid[0:h, 0:w]
+    d = np.sqrt(((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2)
+    keep = np.clip((d - 1.0) * min(rx, ry) / 2.0, 0.0, 1.0)
+    keep[yy < cy] = 0.0
+    a[..., 3] = al * keep
+    print(f"      鍋の口：中心 ({cx / w:.0%}, {cy / h:.0%})  はば {2 * rx / w:.0%}  高さ {2 * ry / h:.0%}")
+    return Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
+
+
 def cover(img, w, h):
     scale = max(w / img.width, h / img.height)
     img = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
@@ -89,6 +135,13 @@ def process(src):
             dst = OUT / rel.with_suffix(".png")
             dst.parent.mkdir(parents=True, exist_ok=True)
             fit_height(trim(key_magenta(im), 0.02), 900).save(dst, optimize=True)
+        elif kind == "ui":
+            dst = OUT / rel.with_suffix(".png")
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            art = fit_box(trim(key_magenta(im), 0.0), 900)
+            art.save(dst, optimize=True)
+            if rel.stem == "pot":
+                pot_front(art).save(dst.with_name("pot-front.png"), optimize=True)
         elif kind in SQUARE_KINDS:
             dst = OUT / rel.with_suffix(".png")
             dst.parent.mkdir(parents=True, exist_ok=True)

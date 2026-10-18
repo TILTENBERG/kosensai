@@ -27,6 +27,7 @@ function buildGameData({ config, data, assets }) {
         receiver: new Set((assets.chara && assets.chara.receiver) || []),
       },
       bg: assets.bg || {},
+      ui: new Set(assets.ui || []),
       sounds: assets.sounds,
     },
     ...data,

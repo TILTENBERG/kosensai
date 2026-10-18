@@ -69,29 +69,25 @@ function makeReceiverView(info, difficulty, rng = Math.random) {
 }
 
 // 受信側に見せる料理の選択肢を作る。count が 0 か料理の数以上なら null（＝全部の料理から選ぶ）。
-// 選択肢 = お題 ＋ 送った情報にいちばん近い料理（ひっかけ）＋ のこりはランダム。順番はシャッフル。
+// 選択肢 = お題 ＋ 送った情報に近い順の料理（ぜんぶ ひっかけ）。同点はランダム、順番はシャッフル。
+// ランダムな料理をまぜると「明らかにちがう」選択肢になって、かんたんすぎるため。
 function makeChoices(targetDishId, info, dishes, count, rng = Math.random) {
   if (!(count > 0) || count >= dishes.length) return null;
-  const pick = (list) => list[Math.floor(rng() * list.length)];
-  const others = dishes.filter((d) => d.id !== targetDishId);
+  const others = shuffle(dishes.filter((d) => d.id !== targetDishId), rng)
+    .map((d) => ({ id: d.id, score: scoreDish(info, d).score }))
+    .sort((a, b) => b.score - a.score); // sort は安定なので、同点の中はシャッフルした順のまま
+  const chosen = [targetDishId, ...others.slice(0, count - 1).map((s) => s.id)];
+  // お題がいつも同じ場所にならないように
+  return shuffle(chosen, rng);
+}
 
-  const scored = others.map((d) => ({ id: d.id, score: scoreDish(info, d).score }));
-  const best = Math.max(...scored.map((s) => s.score));
-  const chosen = [targetDishId];
-  if (count >= 2) chosen.push(pick(scored.filter((s) => s.score === best)).id);
-
-  let rest = others.map((d) => d.id).filter((id) => !chosen.includes(id));
-  while (chosen.length < count && rest.length) {
-    const id = pick(rest);
-    chosen.push(id);
-    rest = rest.filter((x) => x !== id);
-  }
-  // シャッフル（お題がいつも同じ場所にならないように）
-  for (let i = chosen.length - 1; i > 0; i--) {
+function shuffle(list, rng) {
+  const a = [...list];
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
-    [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return chosen;
+  return a;
 }
 
 class GameRoom {
