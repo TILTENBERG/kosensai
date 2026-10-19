@@ -527,3 +527,43 @@ body.receiver .has-chara .decor__item:nth-child(n+6) { display: none; }
 body.receiver .result-dish .stamp { top: 100px; right: -60px; }
 
 .result-dish__name.is-long { font-size: 30px; white-space: nowrap; }
+
+/* ---------- リザルト：送った情報（お題とくらべて ○×） ---------- */
+/* いちばん長い名前の組み合わせでも 1920px に入る大きさ（チップは回答画面より少し小さい） */
+#app[data-now="result"] .result { gap: 28px; }
+.result-sent { display: flex; align-items: center; gap: 14px; margin-top: -4px; }
+.result-sent__label {
+  margin: 0;
+  padding: 6px 18px;
+  font-size: 24px;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--ink);
+  background: rgba(255, 252, 245, 0.85);
+  border-radius: 18px;
+  white-space: nowrap;
+}
+.result-sent .mini-board { gap: 8px; padding: 8px 18px; }
+.result-sent .mini-chip { font-size: 26px; padding: 2px 14px 2px 6px; }
+.result-sent .mini-chip .icon--mini { width: 38px; height: 38px; font-size: 30px; }
+.sent-chip { position: relative; transition: background 0.3s, border-color 0.3s, opacity 0.3s; }
+.sent-chip__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 2px;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  transform: scale(0);
+}
+.sent-chip.is-revealed .sent-chip__mark { animation: mark-pop 0.35s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+.sent-chip.is-revealed.is-ok { background: #d9f7e8; border-color: #6fcf9a; }
+.sent-chip.is-revealed.is-ok .sent-chip__mark { background: #22a861; }
+.sent-chip.is-revealed.is-ng { background: #f3eeea; border-color: #e0d5cc; color: var(--ink-soft); }
+.sent-chip.is-revealed.is-ng .sent-chip__mark { background: #d9534f; }
+.sent-chip.is-revealed.is-ng .icon { opacity: 0.7; }
+@keyframes mark-pop { from { transform: scale(0); } to { transform: scale(1); } }

@@ -482,8 +482,8 @@ function explainLine(r) {
     if (r.madeDish.id === r.targetDish.id) return null;
     return `こたえは正解！ でも ${r.tier === 'mystery' ? 'なぞの料理' : r.madeDish.name}に なっちゃった`;
   }
-  if (r.madeDish.id === r.answerDish.id && r.tier !== 'mystery') return `情報どおりだけど お題は ${r.targetDish.name}だったよ`;
-  return `ざんねん！ お題は ${r.targetDish.name}だったよ`;
+  if (r.madeDish.id === r.answerDish.id && r.tier !== 'mystery') return `情報どおりだけど お題は ${r.targetDish.name} だったよ`;
+  return `ざんねん！ お題は ${r.targetDish.name} だったよ`;
 }
 
 // 完成度を 0 からカウントアップ
@@ -587,6 +587,29 @@ export function showResult(resultData) {
       ),
     ),
   );
+  // 送った情報を、お題の正解とくらべて ○× で見せる（次のプレイで何を変えればいいか分かるように）
+  const t = r.targetDish;
+  const sentChip = (kind, item, ok) => h('span', { class: `mini-chip sent-chip ${ok ? 'is-ok' : 'is-ng'}` },
+    h('span', { class: 'sent-chip__mark' }, ok ? '○' : '×'),
+    iconEl(kind, item, 'icon icon--mini'),
+    item.name,
+  );
+  const sentChips = [
+    ...r.sent.ingredients.map((i) => sentChip('ingredients', i, t.ingredients.includes(i.id))),
+    sentChip('seasonings', r.sent.seasoning, r.sent.seasoning.id === t.seasoning),
+    sentChip('tools', r.sent.method, r.sent.method.id === t.method),
+  ];
+  const sentRow = h('div', { class: 'result-sent' },
+    h('p', { class: 'result-sent__label' }, `${isReceiver ? 'とどいた' : '送った'}情報`, h('br'), 'お題とくらべると'),
+    h('div', { class: 'mini-board' },
+      ...sentChips.slice(0, 3),
+      h('span', { class: 'mini-sep' }),
+      ...sentChips.slice(3),
+      h('span', { class: 'mini-sep' }),
+      h('span', { class: 'mini-chip mini-chip--memo' }, `💬 ${r.sent.memo}`),
+    ),
+  );
+
   tier.style.visibility = 'hidden';
   setChara('think', 'どうかな…？');
 
@@ -603,6 +626,7 @@ export function showResult(resultData) {
         answerCard,
       ),
     ),
+    sentRow,
   );
 
   (async () => {
@@ -612,6 +636,8 @@ export function showResult(resultData) {
 
     // 点数に応じた演出
     tier.style.visibility = '';
+    // ○× を1つずつ出す
+    sentChips.forEach((chip, i) => setTimeout(() => chip.classList.add('is-revealed'), 300 + i * 140));
     if (r.tier === 'perfect') {
       play('fanfare');
       confetti();
